@@ -2,31 +2,23 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:smart_trip_planner_app/custom/color.dart';
-import 'package:smart_trip_planner_app/elements/create_button.dart';
 import 'package:smart_trip_planner_app/elements/fill_box.dart';
+import 'package:smart_trip_planner_app/elements/create_button.dart';
+import 'package:smart_trip_planner_app/elements/itinerary_view.dart';
 
-void main() {
-  runApp(
-    const MaterialApp(
-      home: TripPlannerHomePage(),
-      debugShowCheckedModeBanner: false,
-    ),
-  );
-}
-
-class TripPlannerHomePage extends StatefulWidget {
-  const TripPlannerHomePage({super.key});
+class TripPlannerScreen extends StatefulWidget {
+  const TripPlannerScreen({super.key});
 
   @override
-  State<TripPlannerHomePage> createState() => _TripPlannerHomePageState();
+  State<TripPlannerScreen> createState() => _TripPlannerScreenState();
 }
 
-class _TripPlannerHomePageState extends State<TripPlannerHomePage> {
+class _TripPlannerScreenState extends State<TripPlannerScreen> {
   final TextEditingController _promptController = TextEditingController();
   Map<String, dynamic>? _itinerary;
   bool _isLoading = false;
-  String? _error;
   int _estimatedTokensUsed = 0;
+  String? _error;
 
   static const String _apiKey = 'iuAfB9KCbgyGauQS23mDHrEudiSINa7EX8errPlP';
 
@@ -37,6 +29,7 @@ class _TripPlannerHomePageState extends State<TripPlannerHomePage> {
       _isLoading = true;
       _error = null;
       _itinerary = null;
+      _estimatedTokensUsed = 0;
     });
 
     const String endpoint = 'https://api.cohere.ai/v1/chat';
@@ -95,19 +88,19 @@ TRIP DESCRIPTION: $prompt
             final itinerary = jsonDecode(jsonStr);
             setState(() {
               _itinerary = itinerary;
-              _estimatedTokensUsed += totalTokens;
+              _estimatedTokensUsed = totalTokens;
             });
           } catch (e) {
             setState(() {
               _error = '⚠️ Failed to parse JSON: $e\n\nRaw output:\n$text';
-              _estimatedTokensUsed += totalTokens;
+              _estimatedTokensUsed = totalTokens;
             });
           }
         } else {
           setState(() {
             _error =
                 '⚠️ JSON format not found in response.\n\nRaw output:\n$text';
-            _estimatedTokensUsed += totalTokens;
+            _estimatedTokensUsed = totalTokens;
           });
         }
       } else {
@@ -126,52 +119,10 @@ TRIP DESCRIPTION: $prompt
     }
   }
 
-  Widget _buildItineraryView(Map<String, dynamic> itinerary) {
-    final days = itinerary['days'] as List<dynamic>;
-    return Expanded(
-      child: ListView(
-        children: [
-          Text(
-            "Title: ${itinerary['title']}",
-            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-          ),
-          Text(
-            "Start Date: ${itinerary['startDate']}",
-            style: const TextStyle(fontSize: 16),
-          ),
-          Text(
-            "End Date: ${itinerary['endDate']}",
-            style: const TextStyle(fontSize: 16),
-          ),
-          const Divider(),
-          ...List.generate(days.length, (i) {
-            final day = days[i];
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  "Day ${i + 1}: ${day['date']} - ${day['summary']}",
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                ...List.generate((day['items'] as List).length, (j) {
-                  final item = day['items'][j];
-                  return Padding(
-                    padding: const EdgeInsets.only(left: 8.0, bottom: 4.0),
-                    child: Text(
-                      "• ${item['time']}: ${item['activity']} (Location: ${item['location']})",
-                    ),
-                  );
-                }),
-                const SizedBox(height: 12),
-              ],
-            );
-          }),
-        ],
-      ),
-    );
+  @override
+  void dispose() {
+    _promptController.dispose();
+    super.dispose();
   }
 
   @override
@@ -190,6 +141,7 @@ TRIP DESCRIPTION: $prompt
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // Greeting Row
               Row(
                 children: [
                   Text(
@@ -215,7 +167,10 @@ TRIP DESCRIPTION: $prompt
                   ),
                 ],
               ),
+
               SizedBox(height: screenHeight * 0.04),
+
+              // Title
               Text(
                 "What's your vision\nfor this trip?",
                 style: TextStyle(
@@ -223,27 +178,46 @@ TRIP DESCRIPTION: $prompt
                   fontWeight: FontWeight.w700,
                 ),
               ),
+
               SizedBox(height: screenHeight * 0.03),
-              fill_box(
-                controller: _promptController,
-                onSubmit: (value) {
-                  _generateItinerary(value);
-                },
-              ),
+
+              // Vision TextField Box (fill_box)
+              _itinerary == null
+                  ? fill_box(
+                      controller: _promptController,
+                      onSubmit: (value) {
+                        if (value.trim().isNotEmpty) {
+                          _generateItinerary(value.trim());
+                        }
+                      },
+                    )
+                  : ItineraryView(itinerary: _itinerary!),
+
               SizedBox(height: screenHeight * 0.025),
+
               _isLoading
                   ? const Center(child: CircularProgressIndicator())
                   : CreateButton(
                       onPressed: () {
                         final prompt = _promptController.text.trim();
-                        if (prompt.isNotEmpty) _generateItinerary(prompt);
+                        if (prompt.isNotEmpty) {
+                          _generateItinerary(prompt);
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Please enter your trip vision.'),
+                            ),
+                          );
+                        }
                       },
                     ),
 
               const SizedBox(height: 18),
+
               if (_error != null)
                 Text(_error!, style: const TextStyle(color: Colors.red)),
-              if (_itinerary != null) _buildItineraryView(_itinerary!),
+
+              // if (_itinerary != null) ItineraryView(itinerary: _itinerary!),
               Text(
                 '🧠 Estimated Tokens Used: $_estimatedTokensUsed',
                 style: const TextStyle(
