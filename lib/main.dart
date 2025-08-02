@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:smart_trip_planner_app/screens/home_page.dart';
+import 'package:smart_trip_planner_app/screens/login_page.dart';
 
 void main() {
   runApp(const MyApp());
