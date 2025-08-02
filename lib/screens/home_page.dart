@@ -5,6 +5,7 @@ import 'package:smart_trip_planner_app/custom/color.dart';
 import 'package:smart_trip_planner_app/elements/fill_box.dart';
 import 'package:smart_trip_planner_app/elements/create_button.dart';
 import 'package:smart_trip_planner_app/elements/itinerary_view.dart';
+import 'package:smart_trip_planner_app/screens/token_screen.dart';
 
 class TripPlannerScreen extends StatefulWidget {
   const TripPlannerScreen({super.key});
@@ -153,15 +154,25 @@ TRIP DESCRIPTION: $prompt
                     ),
                   ),
                   const Spacer(),
-                  CircleAvatar(
-                    radius: screenWidth * 0.055,
-                    backgroundColor: AppColors.primary,
-                    child: Text(
-                      "S",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: screenWidth * 0.044,
-                        fontWeight: FontWeight.w600,
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => DemoTokenPage(),
+                        ),
+                      );
+                    },
+                    child: CircleAvatar(
+                      radius: screenWidth * 0.055,
+                      backgroundColor: AppColors.primary,
+                      child: Text(
+                        "S",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: screenWidth * 0.044,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                     ),
                   ),
