@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:smart_trip_planner_app/custom/color.dart';
 
 class fill_box extends StatefulWidget {
+  final TextEditingController controller;
   const fill_box({
     super.key,
+    required this.controller,
     required Null Function(dynamic visionText) onSubmit,
   });
 
@@ -26,6 +28,7 @@ class _fill_boxState extends State<fill_box> {
         children: [
           Expanded(
             child: TextField(
+              controller: widget.controller,
               decoration: InputDecoration(
                 border: InputBorder.none,
                 hintText: "Enter Your Request!",

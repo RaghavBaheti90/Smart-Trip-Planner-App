@@ -2,14 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:smart_trip_planner_app/custom/color.dart';
 import 'package:smart_trip_planner_app/data/output/output.dart';
 
-class create_button extends StatefulWidget {
-  const create_button({super.key});
+class CreateButton extends StatefulWidget {
+  final VoidCallback onPressed;
+
+  const CreateButton({super.key, required this.onPressed});
 
   @override
-  State<create_button> createState() => _create_buttonState();
+  State<CreateButton> createState() => _CreateButtonState();
 }
 
-class _create_buttonState extends State<create_button> {
+class _CreateButtonState extends State<CreateButton> {
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
@@ -24,12 +26,7 @@ class _create_buttonState extends State<create_button> {
             borderRadius: BorderRadius.circular(screenWidth * 0.03),
           ),
         ),
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => TripPlannerScreen()),
-          );
-        },
+        onPressed: widget.onPressed,
         child: Text(
           "Create My Itinerary",
           style: TextStyle(fontSize: screenWidth * 0.042, color: Colors.white),
