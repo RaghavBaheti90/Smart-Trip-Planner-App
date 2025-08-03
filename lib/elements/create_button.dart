@@ -4,8 +4,8 @@ import 'package:smart_trip_planner_app/data/output/output.dart';
 
 class CreateButton extends StatefulWidget {
   final VoidCallback onPressed;
-
-  const CreateButton({super.key, required this.onPressed});
+  final String Text;
+  const CreateButton({super.key, required this.onPressed, required this.Text});
 
   @override
   State<CreateButton> createState() => _CreateButtonState();
@@ -28,7 +28,7 @@ class _CreateButtonState extends State<CreateButton> {
         ),
         onPressed: widget.onPressed,
         child: Text(
-          "Create My Itinerary",
+          widget.Text,
           style: TextStyle(fontSize: screenWidth * 0.042, color: Colors.white),
         ),
       ),

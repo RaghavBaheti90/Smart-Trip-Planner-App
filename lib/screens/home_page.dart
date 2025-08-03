@@ -208,7 +208,24 @@ TRIP DESCRIPTION: $prompt
 
               _isLoading
                   ? const Center(child: CircularProgressIndicator())
+                  : _itinerary == null
+                  ? CreateButton(
+                      Text: "Create My Itinerary",
+                      onPressed: () {
+                        final prompt = _promptController.text.trim();
+                        if (prompt.isNotEmpty) {
+                          _generateItinerary(prompt);
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Please enter your trip vision.'),
+                            ),
+                          );
+                        }
+                      },
+                    )
                   : CreateButton(
+                      Text: "Follow up to refine",
                       onPressed: () {
                         final prompt = _promptController.text.trim();
                         if (prompt.isNotEmpty) {

@@ -199,6 +199,7 @@ class _LoginPageState extends State<LoginPage> {
 
                 // Login button
                 CreateButton(
+                  Text: "Create My Itinerary",
                   onPressed: () {
                     Navigator.push(
                       context,

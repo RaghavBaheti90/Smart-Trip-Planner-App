@@ -218,6 +218,7 @@ class _SignupPageState extends State<SignupPage> {
                 //   ),
                 // ),
                 CreateButton(
+                  Text: "Create My Itinerary",
                   onPressed: () {
                     Navigator.push(
                       context,
