@@ -5,6 +5,7 @@ import 'package:smart_trip_planner_app/custom/color.dart';
 import 'package:smart_trip_planner_app/elements/fill_box.dart';
 import 'package:smart_trip_planner_app/elements/create_button.dart';
 import 'package:smart_trip_planner_app/elements/itinerary_view.dart';
+import 'package:smart_trip_planner_app/screens/chart_page.dart';
 import 'package:smart_trip_planner_app/screens/token_screen.dart';
 
 class TripPlannerScreen extends StatefulWidget {
@@ -227,16 +228,21 @@ TRIP DESCRIPTION: $prompt
                   : CreateButton(
                       Text: "Follow up to refine",
                       onPressed: () {
-                        final prompt = _promptController.text.trim();
-                        if (prompt.isNotEmpty) {
-                          _generateItinerary(prompt);
-                        } else {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Please enter your trip vision.'),
+                        // final chatMessages = [
+                        //   ChatMessage(
+                        //     _promptController.text.trim(),
+                        //     Sender.user,
+                        //   ),
+                        //   ChatMessage(jsonEncode(_itinerary ?? {}), Sender.bot),
+                        // ];
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => CohereChatPage(
+                              initialPrompt: _promptController.text,
                             ),
-                          );
-                        }
+                          ),
+                        );
                       },
                     ),
 
