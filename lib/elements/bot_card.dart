@@ -11,9 +11,101 @@ class BotCard extends StatelessWidget {
     Key? key,
   }) : super(key: key);
 
+  // Helper: Builds a RichText widget parsing the input text for Days and Time labels
+  Widget _buildFormattedText(String text, double screenWidth) {
+    final lines = text.split('\n');
+    const timeLabels = ['Morning', 'Afternoon', 'Evening', 'Night'];
+
+    List<InlineSpan> spans = [];
+
+    for (final line in lines) {
+      final trimmed = line.trimLeft();
+      if (trimmed.isEmpty) continue;
+
+      if (trimmed.startsWith('Day')) {
+        // Day heading bold
+        spans.add(
+          TextSpan(
+            text: trimmed + '\n',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: screenWidth * 0.045,
+              color: Colors.black,
+            ),
+          ),
+        );
+      } else if (trimmed.startsWith('•')) {
+        // Bullet point processing for Time labels
+        bool foundLabel = false;
+
+        for (var label in timeLabels) {
+          if (trimmed.startsWith('• $label:')) {
+            spans.add(
+              TextSpan(
+                text: "  • ",
+                style: TextStyle(
+                  fontSize: screenWidth * 0.042,
+                  color: Colors.black,
+                ),
+              ),
+            );
+            spans.add(
+              TextSpan(
+                text: '$label:',
+                style: TextStyle(
+                  fontSize: screenWidth * 0.042,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
+                ),
+              ),
+            );
+            final remainder = trimmed.substring(('• $label:').length);
+            spans.add(
+              TextSpan(
+                text: remainder + '\n',
+                style: TextStyle(
+                  fontSize: screenWidth * 0.042,
+                  color: Colors.black,
+                ),
+              ),
+            );
+            foundLabel = true;
+            break;
+          }
+        }
+
+        if (!foundLabel) {
+          // Normal bullet point indented
+          spans.add(
+            TextSpan(
+              text: "    $trimmed\n",
+              style: TextStyle(
+                fontSize: screenWidth * 0.042,
+                color: Colors.black87,
+              ),
+            ),
+          );
+        }
+      } else {
+        // Plain text lines fallback
+        spans.add(
+          TextSpan(
+            text: trimmed + '\n',
+            style: TextStyle(
+              fontSize: screenWidth * 0.042,
+              color: Colors.black87,
+            ),
+          ),
+        );
+      }
+    }
+    return RichText(text: TextSpan(children: spans));
+  }
+
   @override
   Widget build(BuildContext context) {
-    bool showMapTile = text.contains("Mumbai to Bali, Indonesia");
+    final showMapTile = text.contains("Mumbai") || text.contains("Indonesia");
+
     return Align(
       alignment: Alignment.centerLeft,
       child: Container(
@@ -21,6 +113,10 @@ class BotCard extends StatelessWidget {
         margin: EdgeInsets.symmetric(
           vertical: screenHeight * 0.01,
           horizontal: screenWidth * 0.02,
+        ),
+        padding: EdgeInsets.symmetric(
+          horizontal: screenWidth * 0.04,
+          vertical: screenHeight * 0.018,
         ),
         decoration: BoxDecoration(
           color: Colors.white,
@@ -33,13 +129,10 @@ class BotCard extends StatelessWidget {
             ),
           ],
         ),
-        padding: EdgeInsets.symmetric(
-          horizontal: screenWidth * 0.04,
-          vertical: screenHeight * 0.018,
-        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Header
             Row(
               children: [
                 CircleAvatar(
@@ -63,9 +156,15 @@ class BotCard extends StatelessWidget {
               ],
             ),
             SizedBox(height: screenHeight * 0.008),
-            Text(text, style: TextStyle(fontSize: screenWidth * 0.042)),
+
+            // Formatted text output
+            _buildFormattedText(text, screenWidth),
+
             SizedBox(height: screenHeight * 0.012),
+
             if (showMapTile) _buildMapBox(screenWidth, screenHeight),
+
+            // Action icons
             Row(
               children: [
                 Icon(
@@ -93,15 +192,16 @@ class BotCard extends StatelessWidget {
     );
   }
 
+  // Map panel widget as before
   Widget _buildMapBox(double screenWidth, double screenHeight) {
     return Container(
       margin: EdgeInsets.symmetric(vertical: screenHeight * 0.009),
+      padding: EdgeInsets.all(screenWidth * 0.025),
       decoration: BoxDecoration(
         color: Colors.grey[50],
         borderRadius: BorderRadius.circular(screenWidth * 0.03),
         border: Border.all(color: Colors.grey.shade300),
       ),
-      padding: EdgeInsets.all(screenWidth * 0.025),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

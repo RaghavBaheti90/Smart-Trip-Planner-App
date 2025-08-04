@@ -1,9 +1,9 @@
-import 'package:flutter/material.dart';
-import 'package:smart_trip_planner_app/custom/color.dart';
-
 import 'dart:convert';
+
+import 'package:flutter/material.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:http/http.dart' as http;
-import 'package:smart_trip_planner_app/data/modeal/message.dart';
+import 'package:smart_trip_planner_app/custom/color.dart';
 import 'package:smart_trip_planner_app/elements/bot_card.dart';
 import 'package:smart_trip_planner_app/elements/bot_thinking.dart';
 import 'package:smart_trip_planner_app/elements/input_bar.dart';
@@ -24,12 +24,15 @@ class _ItineraryChatPageState extends State<ItineraryChatPage> {
   bool _isLoading = false;
   String? _error;
 
+  late Box tripBox;
+
   static const String _apiKey = 'iuAfB9KCbgyGauQS23mDHrEudiSINa7EX8errPlP';
   static const String _endpoint = 'https://api.cohere.ai/v1/chat';
 
   @override
   void initState() {
     super.initState();
+    tripBox = Hive.box('tripBox'); // Make sure box is already opened in main()
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _sendMessage(input: widget.initialPrompt);
     });
@@ -89,6 +92,7 @@ Do not add extra explanations. Only show the new full itinerary.
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         final reply = data['text'] ?? '[No response]';
+
         setState(() {
           _messages.add(Message(sender: Sender.bot, text: reply));
         });
@@ -108,10 +112,35 @@ Do not add extra explanations. Only show the new full itinerary.
     }
   }
 
+  // Save last bot message to Hive
+  Future<void> _saveLastTrip() async {
+    try {
+      final lastBotMessage = _messages.lastWhere(
+        (msg) => msg.sender == Sender.bot,
+        orElse: () => Message(sender: Sender.bot, text: ''),
+      );
+      if (lastBotMessage.text.isNotEmpty) {
+        await tripBox.put('lastTrip', lastBotMessage.text);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Trip saved successfully')),
+        );
+      } else {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('No trip to save')));
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Error saving trip: $e')));
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
+
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
@@ -131,13 +160,12 @@ Do not add extra explanations. Only show the new full itinerary.
             padding: EdgeInsets.only(right: screenWidth * 0.04),
             child: CircleAvatar(
               radius: screenWidth * 0.046,
-              child: Text(
-                'S',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: screenWidth * 0.045,
-                ),
+              child: Icon(
+                Icons.person,
+                size: screenWidth * 0.045,
+                color: const Color.fromARGB(255, 16, 11, 11),
               ),
+              backgroundColor: Theme.of(context).primaryColor,
             ),
           ),
         ],
@@ -185,6 +213,24 @@ Do not add extra explanations. Only show the new full itinerary.
                 ),
               ),
             ),
+          // Padding(
+          //   padding: EdgeInsets.symmetric(
+          //     horizontal: screenWidth * 0.05,
+          //     vertical: 10,
+          //   ),
+          //   child: ElevatedButton.icon(
+          //     onPressed: _saveLastTrip,
+          //     icon: const Icon(Icons.save_alt_outlined),
+          //     label: const Text('Save Trip'),
+          //     style: ElevatedButton.styleFrom(
+          //       minimumSize: Size(double.infinity, 48),
+          //       textStyle: TextStyle(
+          //         fontSize: screenWidth * 0.045,
+          //         fontWeight: FontWeight.bold,
+          //       ),
+          //     ),
+          //   ),
+          // ),
           InputBar(
             screenWidth: screenWidth,
             screenHeight: screenHeight,
@@ -196,4 +242,12 @@ Do not add extra explanations. Only show the new full itinerary.
       ),
     );
   }
+}
+
+enum Sender { user, bot }
+
+class Message {
+  final Sender sender;
+  final String text;
+  Message({required this.sender, required this.text});
 }

@@ -42,14 +42,13 @@ class UserCard extends StatelessWidget {
             Row(
               children: [
                 CircleAvatar(
-                  radius: screenWidth * 0.041,
-                  child: Text(
-                    'S',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: screenWidth * 0.045,
-                    ),
+                  radius: screenWidth * 0.046,
+                  child: Icon(
+                    Icons.person,
+                    size: screenWidth * 0.045,
+                    color: const Color.fromARGB(255, 16, 11, 11),
                   ),
+                  backgroundColor: Theme.of(context).primaryColor,
                 ),
                 SizedBox(width: screenWidth * 0.02),
                 Text(

@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:smart_trip_planner_app/custom/color.dart';
+import 'package:smart_trip_planner_app/elements/SavedTripsView.dart';
 import 'package:smart_trip_planner_app/elements/fill_box.dart';
 import 'package:smart_trip_planner_app/elements/create_button.dart';
 import 'package:smart_trip_planner_app/elements/itinerary_view.dart';
@@ -94,7 +95,8 @@ TRIP DESCRIPTION: $prompt
             });
           } catch (e) {
             setState(() {
-              _error = '⚠️ Failed to parse JSON: $e\n\nRaw output:\n$text';
+              _error =
+                  '⚠️ Prompt is not understood. Please rewrite the prompt and try again.';
               _estimatedTokensUsed = totalTokens;
             });
           }
@@ -143,11 +145,10 @@ TRIP DESCRIPTION: $prompt
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Greeting Row
               Row(
                 children: [
                   Text(
-                    "Hey Shubham 👋",
+                    "Hey User 👋",
                     style: TextStyle(
                       color: AppColors.primary,
                       fontSize: screenWidth * 0.055,
@@ -160,29 +161,25 @@ TRIP DESCRIPTION: $prompt
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => DemoTokenPage(),
+                          builder: (context) =>
+                              // SavedTripsPage(),
+                              DemoTokenPage(token: _estimatedTokensUsed),
                         ),
                       );
                     },
                     child: CircleAvatar(
                       radius: screenWidth * 0.055,
                       backgroundColor: AppColors.primary,
-                      child: Text(
-                        "S",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: screenWidth * 0.044,
-                          fontWeight: FontWeight.w600,
-                        ),
+                      child: Icon(
+                        Icons.person,
+                        color: Colors.white,
+                        size: screenWidth * 0.055,
                       ),
                     ),
                   ),
                 ],
               ),
-
               SizedBox(height: screenHeight * 0.04),
-
-              // Title
               Text(
                 "What's your vision\nfor this trip?",
                 style: TextStyle(
@@ -190,10 +187,7 @@ TRIP DESCRIPTION: $prompt
                   fontWeight: FontWeight.w700,
                 ),
               ),
-
               SizedBox(height: screenHeight * 0.03),
-
-              // Vision TextField Box (fill_box)
               _itinerary == null
                   ? fill_box(
                       controller: _promptController,
@@ -204,9 +198,7 @@ TRIP DESCRIPTION: $prompt
                       },
                     )
                   : ItineraryView(itinerary: _itinerary!),
-
               SizedBox(height: screenHeight * 0.025),
-
               _isLoading
                   ? const Center(child: CircularProgressIndicator())
                   : _itinerary == null
@@ -228,13 +220,6 @@ TRIP DESCRIPTION: $prompt
                   : CreateButton(
                       Text: "Follow up to refine",
                       onPressed: () {
-                        // final chatMessages = [
-                        //   ChatMessage(
-                        //     _promptController.text.trim(),
-                        //     Sender.user,
-                        //   ),
-                        //   ChatMessage(jsonEncode(_itinerary ?? {}), Sender.bot),
-                        // ];
                         Navigator.push(
                           context,
                           MaterialPageRoute(
@@ -245,13 +230,9 @@ TRIP DESCRIPTION: $prompt
                         );
                       },
                     ),
-
               const SizedBox(height: 18),
-
               if (_error != null)
                 Text(_error!, style: const TextStyle(color: Colors.red)),
-
-              // if (_itinerary != null) ItineraryView(itinerary: _itinerary!),
               Text(
                 '🧠 Estimated Tokens Used: $_estimatedTokensUsed',
                 style: const TextStyle(

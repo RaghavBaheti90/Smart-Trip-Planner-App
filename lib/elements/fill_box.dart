@@ -36,7 +36,7 @@ class _fill_boxState extends State<fill_box> {
               style: TextStyle(fontSize: screenWidth * 0.04),
             ),
           ),
-          Icon(Icons.mic, color: AppColors.primary, size: screenWidth * 0.06),
+          // Icon(Icons.mic, color: AppColors.primary, size: screenWidth * 0.06),
         ],
       ),
     );

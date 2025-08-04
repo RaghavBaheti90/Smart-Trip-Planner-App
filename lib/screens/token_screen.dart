@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:smart_trip_planner_app/elements/SavedTripsView.DART';
+// import 'package:smart_trip_planner_app/elements/SavedTripsView.dart';
 
 class DemoTokenPage extends StatefulWidget {
-  const DemoTokenPage({super.key});
+  final int token;
+  const DemoTokenPage({super.key, required this.token});
 
   @override
   State<DemoTokenPage> createState() => _DemoTokenPageState();
@@ -156,6 +159,7 @@ class _DemoTokenPageState extends State<DemoTokenPage> {
               ),
             ),
             const SizedBox(height: 30),
+            // SavedTripsView(),
           ],
         ),
       ),
