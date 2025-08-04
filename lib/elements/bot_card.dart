@@ -11,7 +11,6 @@ class BotCard extends StatelessWidget {
     Key? key,
   }) : super(key: key);
 
-  // Helper: Builds a RichText widget parsing the input text for Days and Time labels
   Widget _buildFormattedText(String text, double screenWidth) {
     final lines = text.split('\n');
     const timeLabels = ['Morning', 'Afternoon', 'Evening', 'Night'];
@@ -62,7 +61,7 @@ class BotCard extends StatelessWidget {
             final remainder = trimmed.substring(('• $label:').length);
             spans.add(
               TextSpan(
-                text: remainder + '\n',
+                text: remainder + '\n\n\n',
                 style: TextStyle(
                   fontSize: screenWidth * 0.042,
                   color: Colors.black,
@@ -75,7 +74,6 @@ class BotCard extends StatelessWidget {
         }
 
         if (!foundLabel) {
-          // Normal bullet point indented
           spans.add(
             TextSpan(
               text: "    $trimmed\n",
@@ -87,7 +85,6 @@ class BotCard extends StatelessWidget {
           );
         }
       } else {
-        // Plain text lines fallback
         spans.add(
           TextSpan(
             text: trimmed + '\n',
@@ -157,14 +154,12 @@ class BotCard extends StatelessWidget {
             ),
             SizedBox(height: screenHeight * 0.008),
 
-            // Formatted text output
             _buildFormattedText(text, screenWidth),
 
             SizedBox(height: screenHeight * 0.012),
 
             if (showMapTile) _buildMapBox(screenWidth, screenHeight),
 
-            // Action icons
             Row(
               children: [
                 Icon(
@@ -192,7 +187,6 @@ class BotCard extends StatelessWidget {
     );
   }
 
-  // Map panel widget as before
   Widget _buildMapBox(double screenWidth, double screenHeight) {
     return Container(
       margin: EdgeInsets.symmetric(vertical: screenHeight * 0.009),
