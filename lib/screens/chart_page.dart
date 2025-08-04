@@ -112,7 +112,6 @@ Do not add extra explanations. Only show the new full itinerary.
     }
   }
 
-  // Save last bot message to Hive
   Future<void> _saveLastTrip() async {
     try {
       final lastBotMessage = _messages.lastWhere(
@@ -213,24 +212,31 @@ Do not add extra explanations. Only show the new full itinerary.
                 ),
               ),
             ),
-          // Padding(
-          //   padding: EdgeInsets.symmetric(
-          //     horizontal: screenWidth * 0.05,
-          //     vertical: 10,
-          //   ),
-          //   child: ElevatedButton.icon(
-          //     onPressed: _saveLastTrip,
-          //     icon: const Icon(Icons.save_alt_outlined),
-          //     label: const Text('Save Trip'),
-          //     style: ElevatedButton.styleFrom(
-          //       minimumSize: Size(double.infinity, 48),
-          //       textStyle: TextStyle(
-          //         fontSize: screenWidth * 0.045,
-          //         fontWeight: FontWeight.bold,
-          //       ),
-          //     ),
-          //   ),
-          // ),
+          Padding(
+            padding: EdgeInsets.symmetric(
+              horizontal: screenWidth * 0.05,
+              vertical: screenWidth * 0.01,
+            ),
+            child: ElevatedButton.icon(
+              onPressed: _saveLastTrip,
+              icon: const Icon(Icons.save_alt_outlined, color: Colors.white),
+              label: const Text('Save Trip'),
+              style: ElevatedButton.styleFrom(
+                minimumSize: Size(double.infinity, 48),
+                backgroundColor: AppColors.primary, // Use team color
+                foregroundColor: Colors.white,
+                elevation: 2,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                textStyle: TextStyle(
+                  fontSize: screenWidth * 0.045,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+          ),
           InputBar(
             screenWidth: screenWidth,
             screenHeight: screenHeight,

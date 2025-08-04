@@ -69,7 +69,6 @@ class _LoginPageState extends State<LoginPage> {
 
                 const SizedBox(height: 32),
 
-                // Google Sign In button
                 OutlinedButton.icon(
                   icon: Image.asset(
                     'assets/googlelogo.png',
@@ -89,9 +88,7 @@ class _LoginPageState extends State<LoginPage> {
                     side: BorderSide(color: Colors.grey.shade300),
                     minimumSize: const Size(0, 48),
                   ),
-                  onPressed: () {
-                    // TODO: Add Google sign in logic
-                  },
+                  onPressed: () {},
                 ),
                 const SizedBox(height: 18),
                 Row(

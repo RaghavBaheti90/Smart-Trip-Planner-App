@@ -20,9 +20,7 @@ class ItineraryView extends StatelessWidget {
       child: Center(
         child: Container(
           width: double.infinity,
-          constraints: BoxConstraints(
-            maxWidth: 600, // Limit max width for better tablet/desktop look
-          ),
+          constraints: BoxConstraints(maxWidth: 600),
           padding: EdgeInsets.symmetric(
             horizontal: horizontalPadding,
             vertical: verticalPadding,
