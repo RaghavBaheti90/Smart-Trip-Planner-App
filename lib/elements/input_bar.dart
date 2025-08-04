@@ -21,7 +21,7 @@ class InputBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: EdgeInsets.symmetric(
-        horizontal: screenWidth * 0.03,
+        horizontal: screenWidth * 0.04,
         vertical: screenHeight * 0.01,
       ),
       child: Container(

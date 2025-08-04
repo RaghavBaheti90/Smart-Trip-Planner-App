@@ -13,7 +13,6 @@ class BotCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // You can parse further for dynamically showing place tiles, etc.
     bool showMapTile = text.contains("Mumbai to Bali, Indonesia");
     return Align(
       alignment: Alignment.centerLeft,
