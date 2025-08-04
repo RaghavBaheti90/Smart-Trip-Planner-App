@@ -238,7 +238,7 @@ TRIP DESCRIPTION: $prompt
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => CohereChatPage(
+                            builder: (context) => ItineraryChatPage(
                               initialPrompt: _promptController.text,
                             ),
                           ),

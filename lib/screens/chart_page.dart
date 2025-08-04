@@ -1,19 +1,25 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:smart_trip_planner_app/custom/color.dart';
+
+import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:smart_trip_planner_app/data/modeal/message.dart';
+import 'package:smart_trip_planner_app/elements/bot_card.dart';
+import 'package:smart_trip_planner_app/elements/bot_thinking.dart';
+import 'package:smart_trip_planner_app/elements/input_bar.dart';
+import 'package:smart_trip_planner_app/elements/user_card.dart';
 
-class CohereChatPage extends StatefulWidget {
+class ItineraryChatPage extends StatefulWidget {
   final String initialPrompt;
-
-  const CohereChatPage({Key? key, required this.initialPrompt})
+  const ItineraryChatPage({Key? key, required this.initialPrompt})
     : super(key: key);
 
   @override
-  _CohereChatPageState createState() => _CohereChatPageState();
+  State<ItineraryChatPage> createState() => _ItineraryChatPageState();
 }
 
-class _CohereChatPageState extends State<CohereChatPage> {
-  final List<_Message> _messages = [];
+class _ItineraryChatPageState extends State<ItineraryChatPage> {
+  final List<Message> _messages = [];
   final TextEditingController _inputController = TextEditingController();
   bool _isLoading = false;
   String? _error;
@@ -24,8 +30,6 @@ class _CohereChatPageState extends State<CohereChatPage> {
   @override
   void initState() {
     super.initState();
-
-    // Automatically send the initial prompt on page load
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _sendMessage(input: widget.initialPrompt);
     });
@@ -36,16 +40,12 @@ class _CohereChatPageState extends State<CohereChatPage> {
     if (messageText.isEmpty || _isLoading) return;
 
     setState(() {
-      _messages.add(_Message(sender: Sender.user, text: messageText));
-      if (input == null) {
-        // Only clear controller for user-typed input (not initialPrompt)
-        _inputController.clear();
-      }
+      _messages.add(Message(sender: Sender.user, text: messageText));
+      if (input == null) _inputController.clear();
       _isLoading = true;
       _error = null;
     });
 
-    // Build chat history for API
     final chatHistory = _messages
         .map(
           (m) => {
@@ -55,9 +55,21 @@ class _CohereChatPageState extends State<CohereChatPage> {
         )
         .toList();
 
-    // The assistant's system prompt
-    final systemPrompt =
-        'You are an intelligent, helpful assistant. Reply conversationally to the user.';
+    final systemPrompt = '''
+You are an expert itinerary assistant.
+- Always return the entire multi-day plan after any user message.
+- Group each day's plan as:
+
+Day 1:
+  Morning: <activities, locations>
+  Afternoon: <activities, locations>
+  Evening: <activities, locations>
+  Night: <activities, locations>
+
+Label activities clearly using times of day (Morning, Afternoon, Evening, Night).
+When a user asks for a change (e.g., "Add tea party on day 4 afternoon"), edit and show the whole new plan in the same style.
+Do not add extra explanations. Only show the new full itinerary.
+''';
 
     try {
       final response = await http.post(
@@ -78,7 +90,7 @@ class _CohereChatPageState extends State<CohereChatPage> {
         final data = jsonDecode(response.body);
         final reply = data['text'] ?? '[No response]';
         setState(() {
-          _messages.add(_Message(sender: Sender.bot, text: reply));
+          _messages.add(Message(sender: Sender.bot, text: reply));
         });
       } else {
         setState(() {
@@ -98,115 +110,90 @@ class _CohereChatPageState extends State<CohereChatPage> {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
     return Scaffold(
-      appBar: AppBar(title: const Text('Cohere ChatBot')),
+      backgroundColor: AppColors.background,
+      appBar: AppBar(
+        backgroundColor: AppColors.background,
+        elevation: 0,
+        title: Text(
+          'Itinerary Chat',
+          style: TextStyle(
+            fontWeight: FontWeight.w600,
+            color: Colors.black,
+            fontSize: screenWidth * 0.05,
+          ),
+        ),
+        leading: const BackButton(color: Colors.black),
+        actions: [
+          Padding(
+            padding: EdgeInsets.only(right: screenWidth * 0.04),
+            child: CircleAvatar(
+              radius: screenWidth * 0.046,
+              child: Text(
+                'S',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: screenWidth * 0.045,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
       body: Column(
         children: [
           Expanded(
-            child: ListView.separated(
+            child: ListView.builder(
               reverse: true,
-              padding: const EdgeInsets.all(16),
+              padding: EdgeInsets.all(screenWidth * 0.025),
               itemCount: _messages.length + (_isLoading ? 1 : 0),
               itemBuilder: (context, i) {
-                if (_isLoading && i == 0) return _buildBotThinking();
+                if (_isLoading && i == 0) {
+                  return BotThinking(
+                    screenWidth: screenWidth,
+                    screenHeight: screenHeight,
+                  );
+                }
                 final msg =
                     _messages[_messages.length -
                         1 -
                         (i - (_isLoading ? 1 : 0))];
                 return msg.sender == Sender.user
-                    ? _buildUserBubble(msg.text)
-                    : _buildBotBubble(msg.text);
+                    ? UserCard(
+                        text: msg.text,
+                        screenWidth: screenWidth,
+                        screenHeight: screenHeight,
+                      )
+                    : BotCard(
+                        text: msg.text,
+                        screenWidth: screenWidth,
+                        screenHeight: screenHeight,
+                      );
               },
-              separatorBuilder: (_, __) => const SizedBox(height: 10),
             ),
           ),
-          const Divider(height: 1),
-          _buildInputBar(),
           if (_error != null)
             Padding(
-              padding: const EdgeInsets.all(8),
-              child: Text(_error!, style: const TextStyle(color: Colors.red)),
-            ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildUserBubble(String text) {
-    return Align(
-      alignment: Alignment.centerRight,
-      child: Container(
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          color: Colors.blue.shade100,
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Text(text),
-      ),
-    );
-  }
-
-  Widget _buildBotBubble(String text) {
-    return Align(
-      alignment: Alignment.centerLeft,
-      child: Container(
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          color: Colors.grey.shade200,
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Text(text),
-      ),
-    );
-  }
-
-  Widget _buildInputBar() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      child: Row(
-        children: [
-          Expanded(
-            child: TextField(
-              controller: _inputController,
-              decoration: const InputDecoration(
-                hintText: "Type your message...",
-                border: InputBorder.none,
+              padding: EdgeInsets.all(screenWidth * 0.025),
+              child: Text(
+                _error!,
+                style: TextStyle(
+                  color: Colors.red,
+                  fontSize: screenWidth * 0.04,
+                ),
               ),
-              onSubmitted: (_) => _sendMessage(),
-              enabled: !_isLoading,
             ),
-          ),
-          IconButton(
-            icon: const Icon(Icons.send_rounded, color: Colors.blue),
-            onPressed: _sendMessage,
+          InputBar(
+            screenWidth: screenWidth,
+            screenHeight: screenHeight,
+            controller: _inputController,
+            isLoading: _isLoading,
+            onSend: _sendMessage,
           ),
         ],
       ),
     );
   }
-
-  Widget _buildBotThinking() {
-    return Align(
-      alignment: Alignment.centerLeft,
-      child: Row(
-        children: const [
-          SizedBox(
-            height: 20,
-            width: 20,
-            child: CircularProgressIndicator(strokeWidth: 2),
-          ),
-          SizedBox(width: 8),
-          Text("Thinking..."),
-        ],
-      ),
-    );
-  }
-}
-
-enum Sender { user, bot }
-
-class _Message {
-  final Sender sender;
-  final String text;
-  _Message({required this.sender, required this.text});
 }
