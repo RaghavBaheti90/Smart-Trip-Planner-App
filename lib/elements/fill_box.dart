@@ -21,7 +21,7 @@ class _fill_boxState extends State<fill_box> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(screenWidth * 0.04),
-        border: Border.all(color: Colors.green.shade200),
+        border: Border.all(color: AppColors.secondary),
       ),
       padding: EdgeInsets.all(screenWidth * 0.04),
       child: Row(

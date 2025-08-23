@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:smart_trip_planner_app/custom/color.dart';
 
 class ItineraryView extends StatelessWidget {
   final Map<String, dynamic> itinerary;
@@ -31,7 +32,7 @@ class ItineraryView extends StatelessWidget {
             border: Border.all(color: Colors.teal.shade100, width: 1),
             boxShadow: [
               BoxShadow(
-                color: Colors.teal.withOpacity(0.07),
+                color: AppColors.secondary.withOpacity(0.3),
                 blurRadius: 12,
                 spreadRadius: 2,
                 offset: Offset(0, 7),
@@ -46,7 +47,7 @@ class ItineraryView extends StatelessWidget {
                 style: TextStyle(
                   fontSize: base * 1.2,
                   fontWeight: FontWeight.bold,
-                  color: Colors.teal.shade700,
+                  color: AppColors.secondary,
                 ),
               ),
               SizedBox(height: base * 0.6),
@@ -55,7 +56,7 @@ class ItineraryView extends StatelessWidget {
                   Icon(
                     Icons.calendar_month,
                     size: base,
-                    color: Colors.teal.shade400,
+                    color: AppColors.secondary,
                   ),
                   SizedBox(width: base * 0.2),
                   Text(
@@ -63,7 +64,7 @@ class ItineraryView extends StatelessWidget {
                     style: TextStyle(fontSize: base),
                   ),
                   SizedBox(width: base * 0.7),
-                  Icon(Icons.flag, size: base, color: Colors.teal.shade400),
+                  Icon(Icons.flag, size: base, color: AppColors.secondary),
                   SizedBox(width: base * 0.2),
                   Text(
                     "End: ${itinerary['endDate'] ?? ''}",
@@ -78,7 +79,7 @@ class ItineraryView extends StatelessWidget {
                   margin: EdgeInsets.only(bottom: base * 0.8, top: base * 0.25),
                   padding: EdgeInsets.all(base * 0.5),
                   decoration: BoxDecoration(
-                    color: Colors.teal.withOpacity(0.04),
+                    color: AppColors.secondary.withOpacity(0.08),
                     borderRadius: BorderRadius.circular(base * 0.6),
                   ),
                   child: Column(
@@ -89,7 +90,7 @@ class ItineraryView extends StatelessWidget {
                         style: TextStyle(
                           fontSize: base * 1.06,
                           fontWeight: FontWeight.w600,
-                          color: Colors.teal.shade800,
+                          color: AppColors.secondary,
                         ),
                       ),
                       SizedBox(height: base * 0.15),
